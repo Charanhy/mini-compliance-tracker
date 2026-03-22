@@ -5,8 +5,8 @@ A comprehensive web application for managing compliance tasks (like tax filings,
 
 ## 🌐 Live Demo
 
-Frontend: https://your-frontend.vercel.app  
-Backend API: https://your-backend.onrender.com  
+Frontend: https://mini-compliance-tracker-peach.vercel.app
+Backend API: https://mini-compliance-tracker-tuly.onrender.com
 
 
 ## 📌 Project Overview
