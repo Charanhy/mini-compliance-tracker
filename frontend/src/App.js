@@ -18,7 +18,7 @@ function App() {
           <span className="user-name">Admin User</span>
         </div>
       </header>
-      
+
       <main className="app-main">
         <aside className="app-sidebar">
           <ClientList onSelect={setSelectedClient} selectedClientId={selectedClient} />
@@ -33,3 +33,5 @@ function App() {
 }
 
 export default App;
+
+
