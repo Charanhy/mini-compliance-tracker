@@ -1,72 +1,29 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const connectDB = require("./config/db");
+
+// Import Routes
+const clientRoutes = require("./routes/clientRoutes");
+const taskRoutes = require("./routes/taskRoutes");
+const authRoutes = require("./routes/authRoutes");
+
+// Connect to Database
+connectDB();
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-/* ---------------- SAMPLE DATA ---------------- */
+// Routes
+app.use("/clients", clientRoutes);
+app.use("/tasks", taskRoutes);
+app.use("/auth", authRoutes);
 
-let clients = [
-  { id: 1, company_name: "ABC Pvt Ltd", country: "India", entity_type: "Private" },
-  { id: 2, company_name: "XYZ Ltd", country: "USA", entity_type: "Corporation" }
-];
-
-let tasks = [
-  {
-    id: 1,
-    client_id: 1,
-    title: "GST Filing",
-    category: "Tax",
-    due_date: "2026-03-20",
-    status: "Pending",
-    priority: "High"
-  }
-];
-
-/* ---------------- ROUTES ---------------- */
-
-// ✅ THIS IS THE MISSING PART
-app.get("/clients", (req, res) => {
-  res.json(clients);
-});
-
-app.get("/tasks/:clientId", (req, res) => {
-  const clientId = parseInt(req.params.clientId);
-  const clientTasks = tasks.filter(t => t.client_id === clientId);
-  res.json(clientTasks);
-});
-
-app.post("/tasks", (req, res) => {
-  const newTask = {
-    id: tasks.length + 1,
-    ...req.body
-  };
-  tasks.push(newTask);
-  res.json(newTask);
-});
-
-app.put("/tasks/:id", (req, res) => {
-  const id = parseInt(req.params.id);
-
-  const task = tasks.find(t => t.id === id);
-
-  if (!task) {
-    return res.status(404).json({ message: "Task not found" });
-  }
-
-  task.status = req.body.status || task.status;
-
-  res.json(task);
-});
-
-
-
-/* ---------------- SERVER ---------------- */
-
+// Root Endpoint
 app.get("/", (req, res) => {
-  res.send("Backend is running 🚀");
+  res.send("Backend is running 🚀 with MongoDB");
 });
 
 const PORT = process.env.PORT || 5000;

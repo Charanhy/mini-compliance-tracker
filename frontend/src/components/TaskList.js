@@ -1,24 +1,43 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import AddTask from "./AddTask";
 import API_URL from "../config";
 import "./TaskList.css";
 
 function TaskList({ clientId }) {
   const [tasks, setTasks] = useState([]);
+  const [stats, setStats] = useState(null);
+  
   const [statusFilter, setStatusFilter] = useState("All");
   const [categoryFilter, setCategoryFilter] = useState("All");
+  
+  const [search, setSearch] = useState("");
+  const [sortField, setSortField] = useState("due_date");
+  const [sortOrder, setSortOrder] = useState("asc");
 
-  const fetchTasks = () => {
+  const fetchTasks = useCallback(() => {
     if (clientId) {
-      fetch(`${API_URL}/tasks/${clientId}`)
+      const queryParams = new URLSearchParams();
+      if (search) queryParams.append("search", search);
+      if (sortField) {
+        queryParams.append("sort", sortField);
+        queryParams.append("order", sortOrder);
+      }
+
+      fetch(`${API_URL}/tasks/${clientId}?${queryParams.toString()}`)
         .then(res => res.json())
-        .then(data => setTasks(data));
+        .then(data => setTasks(data))
+        .catch(err => console.error("Error fetching tasks:", err));
+
+      fetch(`${API_URL}/tasks/stats/${clientId}`)
+        .then(res => res.json())
+        .then(data => setStats(data))
+        .catch(err => console.error("Error fetching stats:", err));
     }
-  };
+  }, [clientId, search, sortField, sortOrder]);
 
   useEffect(() => {
     fetchTasks();
-  }, [clientId]);
+  }, [fetchTasks]);
 
   const updateStatus = (id) => {
     fetch(`${API_URL}/tasks/${id}`, {
@@ -28,18 +47,17 @@ function TaskList({ clientId }) {
     })
     .then(res => res.json())
     .then(() => {
-      setTasks(tasks.map(t => t.id === id ? { ...t, status: "Completed" } : t));
-    });
+      fetchTasks();
+    })
+    .catch(err => console.error("Error updating status:", err));
   };
 
   const isOverdue = (task) => {
     return task.status === "Pending" && new Date(task.due_date) < new Date();
   };
 
-  // Extract unique categories for the filter dropdown
   const categories = ["All", ...new Set(tasks.map(t => t.category).filter(Boolean))];
 
-  // Apply filters
   const filteredTasks = tasks.filter(task => {
     const matchStatus = statusFilter === "All" || task.status === statusFilter;
     const matchCategory = categoryFilter === "All" || task.category === categoryFilter;
@@ -52,26 +70,65 @@ function TaskList({ clientId }) {
 
   return (
     <div className="task-list-container">
+      {stats && (
+        <div className="dashboard-summary">
+          <div className="stat-card">
+            <h3>Total Tasks</h3>
+            <p className="stat-number">{stats.total}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Pending</h3>
+            <p className="stat-number pending">{stats.pending}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Completed</h3>
+            <p className="stat-number completed">{stats.completed}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Overdue</h3>
+            <p className="stat-number overdue">{stats.overdue}</p>
+          </div>
+        </div>
+      )}
+
       <AddTask clientId={clientId} onTaskAdded={fetchTasks} />
 
       <div className="tasks-header">
         <h2>Tasks</h2>
         
         <div className="filters">
+          <div className="filter-group search-bar">
+            <input 
+              type="text" 
+              placeholder="Search tasks..." 
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+
           <div className="filter-group">
-            <label>Status:</label>
+            <select value={sortField} onChange={e => setSortField(e.target.value)}>
+              <option value="due_date">Sort Date</option>
+              <option value="priority">Sort Priority</option>
+            </select>
+            <select value={sortOrder} onChange={e => setSortOrder(e.target.value)}>
+              <option value="asc">Asc</option>
+              <option value="desc">Desc</option>
+            </select>
+          </div>
+
+          <div className="filter-group">
             <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
-              <option value="All">All</option>
+              <option value="All">All Status</option>
               <option value="Pending">Pending</option>
               <option value="Completed">Completed</option>
             </select>
           </div>
 
           <div className="filter-group">
-            <label>Category:</label>
             <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
               {categories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
+                <option key={cat} value={cat}>{cat === "All" ? "All Categories" : cat}</option>
               ))}
             </select>
           </div>
