@@ -87,3 +87,5 @@ This project is prepared for immediate deployment using Render and Vercel.
 2. Ensure Vercel detects Create React App (`npm run build`).
 3. Set an **Environment Variable** named `REACT_APP_API_URL` pointing to your shiny new Render backend URL (e.g., `https://my-backend.onrender.com`).
 4. Click Deploy. (A `vercel.json` is included to handle any potential React Router rewrite issues natively).
+
+
