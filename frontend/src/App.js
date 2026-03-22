@@ -1,23 +1,21 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import ClientList from "./components/ClientList";
+import TaskList from "./components/TaskList";
 
 function App() {
+  const [selectedClient, setSelectedClient] = useState(null);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{ display: "flex", padding: "20px" }}>
+      
+      <div style={{ width: "30%" }}>
+        <ClientList onSelect={setSelectedClient} />
+      </div>
+
+      <div style={{ width: "70%" }}>
+        <TaskList clientId={selectedClient} />
+      </div>
+
     </div>
   );
 }
