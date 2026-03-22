@@ -2,6 +2,22 @@
 
 A comprehensive web application for managing compliance tasks (like tax filings, audits, etc.) for multiple clients.
 
+
+## 🌐 Live Demo
+
+Frontend: https://your-frontend.vercel.app  
+Backend API: https://your-backend.onrender.com  
+
+
+## 📌 Project Overview
+
+This application helps teams efficiently manage compliance tasks across multiple clients.  
+Users can track deadlines, update task statuses, filter tasks, and easily identify overdue items.
+
+The project is built as a **full-stack application** using React (frontend), Node.js (backend), and MongoDB (database).
+
+---
+
 ## Features List
 
 - **Admin Authentication Gate:** A secure React-based login portal that protects the dashboard from unauthorized access. Includes live API authentication handling and dynamic logout features.
